@@ -1,4 +1,4 @@
 # Ignore every .class file
 *.class
-bin/
+
 
