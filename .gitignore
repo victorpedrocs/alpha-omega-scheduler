@@ -1,2 +1,3 @@
 # Ignore every .class file
 bin/
+*.class
