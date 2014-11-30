@@ -3,7 +3,7 @@ package simulador;
 import java.io.IOException;
 
 import escalonadores.EscalonadorAlfaOmega;
-import escalonadores.EscalonadorFCFS;
+import escalonadores.EscalonadorFIFO;
 import processos.EscritorArquivo;
 import processos.LeitorArquivo;
 
@@ -26,7 +26,7 @@ public class Principal {
 
 		System.out.println("\n\nEscalonador FCFS\n");
 		entrada= new LeitorArquivo("processos.txt");
-		Simulador simulador2= new Simulador(entrada, fcfs, new EscalonadorFCFS(), 2);
+		Simulador simulador2= new Simulador(entrada, fcfs, new EscalonadorFIFO(), 2);
 		simulador2.execucao();	
 		
 	}

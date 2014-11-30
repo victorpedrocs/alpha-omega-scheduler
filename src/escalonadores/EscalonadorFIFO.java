@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import processos.Saida;
 import simulador.Core;
 
-public class EscalonadorFCFS extends Escalonador{ // escalonador que pega o primeiro processo da fila de espera
+public class EscalonadorFIFO extends Escalonador{ // escalonador que pega o primeiro processo da fila de espera
 
 	public void escalona(Core core, ArrayList<Saida> lista_saida) throws IOException{
 		
