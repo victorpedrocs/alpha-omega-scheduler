@@ -26,7 +26,9 @@ public class Processo extends Dados implements Comparable<Processo>{
 
 	public void decrementaDuracao(){
 		
-		duracao--;
+		if (duracao > 0) {
+			duracao--;
+		}
 	}
 	
 	public void incrementaTempo_espera(){
