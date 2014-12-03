@@ -82,7 +82,6 @@ public class AlfaOmegaMultiFila extends Escalonador{
 	public void queue(Processo processo) { // coloca o processo na fila de espera
 		
 		if (!this.queues.isEmpty()) {
-			// coeficiente de escalonamento = Tempo de Espera + Numero de processos / 2
 			int idMenorFila = 0;
 			double lessWaitTime = 0f;
 			boolean flag = true;
@@ -155,6 +154,8 @@ public class AlfaOmegaMultiFila extends Escalonador{
 				
 			}
 			else { 
+				updateStatus();
+				
 				return null;
 			}
 		}
@@ -164,6 +165,8 @@ public class AlfaOmegaMultiFila extends Escalonador{
 		}
 		
 		public boolean isEmpty () {
+			updateStatus();
+			
 			return this.processos.isEmpty();
 		}
 		
@@ -171,6 +174,7 @@ public class AlfaOmegaMultiFila extends Escalonador{
 			for (Processo processo : this.processos) {
 				processo.incrementaTempo_espera();
 			}
+			updateStatus();
 		}
 
 		@Override
