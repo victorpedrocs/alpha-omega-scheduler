@@ -81,19 +81,14 @@ public class AlfaOmegaMultiFila extends Escalonador{
 	@Override
 	public void queue(Processo processo) { // coloca o processo na fila de espera
 		
-		/*if (this.coreAndQueue.size() != 0) {
-			ArrayList<ProcessQueue> pqs = new ArrayList<AlfaOmegaMultiFila.ProcessQueue>();
-			pqs.addAll(this.coreAndQueue.values());
-			Collections.sort(pqs);
-			pqs.get(0).queueProcess(processo);
-		}*/
-		
 		if (!this.queues.isEmpty()) {
-			int idMenorFila = 0, lessWaitTime = 0;
+			// coeficiente de escalonamento = Tempo de Espera + Numero de processos / 2
+			int idMenorFila = 0;
+			double lessWaitTime = 0f;
 			boolean flag = true;
 			for (int i = 0; i < nCores; i++) {
 				if((this.queues.get(i).getnProcess() <= lessWaitTime) || flag){
-					lessWaitTime = this.queues.get(i).getWaitTime();
+					lessWaitTime = this.queues.get(i).getnProcess();
 					idMenorFila = i;
 					flag = false;
 				}
@@ -118,6 +113,10 @@ public class AlfaOmegaMultiFila extends Escalonador{
 			this.priority = true;
 			
 			this.updateStatus();
+		}
+		
+		public Double getCoeficienteAlocacao() {
+			return (double) ((this.nProcess+this.totalWaitTime)/2);
 		}
 		
 		public Integer getnProcess() {

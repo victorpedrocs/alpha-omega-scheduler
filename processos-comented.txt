@@ -1,0 +1,11 @@
+# Structure of the file:
+# Process_ID, Time of arrival in the simulator, time of execution
+0,0,5
+1,1,3
+2,2,2
+3,3,6
+4,5,1
+5,6,5
+6,6,4
+7,8,7
+8,9,2
