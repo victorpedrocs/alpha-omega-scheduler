@@ -4,7 +4,8 @@ public class Processo extends Dados implements Comparable<Processo>{
 
 	private int tempo_chegada, // tempo que ele chega pra ser executado
 	duracao, // tempo para executar
-	tempo_cpu; // tempo que dura executando dentro do core, deve ser igual ao tempo de duracao
+	tempo_cpu, // tempo que dura executando dentro do core, deve ser igual ao tempo de duracao
+	duracaoOriginal;
 	// tempo de resposta eh o mesmo do turnarround
 			
 	public Processo(int id, int tempo_chegada, int duracao){
@@ -12,6 +13,7 @@ public class Processo extends Dados implements Comparable<Processo>{
 		this.id= id;
 		this.tempo_chegada= tempo_chegada;
 		this.duracao= duracao;		
+		this.duracaoOriginal = duracao;
 	}
 	
 	public int getId(){
@@ -22,6 +24,10 @@ public class Processo extends Dados implements Comparable<Processo>{
 	public int getDuracao() {
 		
 		return duracao;
+	}
+	
+	public int getDuracaoOriginal() {
+		return this.duracaoOriginal;
 	}
 
 	public void decrementaDuracao(){

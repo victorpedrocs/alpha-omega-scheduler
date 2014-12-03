@@ -2,6 +2,7 @@ package simulador;
 
 import java.io.IOException;
 
+import escalonadores.AlfaOmegaMultiFila;
 import escalonadores.EscalonadorAlfaOmega;
 import escalonadores.EscalonadorFIFO;
 import processos.EscritorArquivo;
@@ -16,6 +17,7 @@ public class Principal {
 		LeitorArquivo entrada;
 		EscritorArquivo saidaAlfaOmega= new EscritorArquivo("alfaomega.txt");
 		EscritorArquivo fcfs= new EscritorArquivo("fcfs.txt");
+		EscritorArquivo alfaOmegaMultiFila = new EscritorArquivo("alfaomega-multicore.txt");
 		
 		//-------------------------------
 
@@ -29,7 +31,14 @@ public class Principal {
 		System.out.println("\n\nEscalonador FCFS\n");
 		entrada= new LeitorArquivo("processos.txt");
 		Simulador simulador2= new Simulador(entrada, fcfs, new EscalonadorFIFO(), nCores);
-		simulador2.execucao();	
+		simulador2.execucao();
+		
+		//-------------------------------
+		
+		System.out.println("\n\nEscalonador AO-MultiFila\n");
+		entrada = new LeitorArquivo("processos.txt");
+		Simulador simulador3 = new Simulador(entrada, alfaOmegaMultiFila, new AlfaOmegaMultiFila(nCores), nCores);
+		simulador3.execucao();
 		
 	}
 

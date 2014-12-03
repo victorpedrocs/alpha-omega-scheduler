@@ -36,7 +36,7 @@ public class Simulador {
 
 	public void execucao() throws IOException{ // de acordo com o ciclo de clock novos processos serao executados nos cores
 
-		while(!(processador.livre() && entradaVazia() && escalonador.whaitEmpty())){			
+		while(!(processador.livre() && entradaVazia() && escalonador.isEmpty())){			
 
 			seleciona();
 			escalonador.controla(processador, lista_saida); //escalona pro processador
@@ -54,7 +54,7 @@ public class Simulador {
 			
 			if(lista_entrada.get(i).getTempo_chegada() == ciclo_clock){ //se o tempo de chegada deles for o tempo do ciclo de clock
 
-				escalonador.whait(lista_entrada.get(i)); //coloco na fila de espera
+				escalonador.queue(lista_entrada.get(i)); //coloco na fila de espera
 				lista_entrada.remove(i); // remove processo da lista de entrada
 				i--;
 			}			

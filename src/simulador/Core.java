@@ -49,13 +49,13 @@ public class Core {
 
 	public void setProcesso(Processo processo){
 
-		disponibilidade= false; // quando coloca um processo o core torna-se indisponivel
+		disponibilidade = processo==null?true:false; // quando coloca um processo o core torna-se indisponivel
 		this.processo= processo;		
 	}
 
 	public boolean disponivel(){
 
-		return disponibilidade;
+		return processo==null;
 	}
 
 	public int getId(){

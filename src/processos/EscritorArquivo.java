@@ -20,9 +20,11 @@ public class EscritorArquivo{
 
 		for(int i=0; i<fila_saida.size(); i++){
 			
-			bw.write(fila_saida.get(i).getId() + "," + fila_saida.get(i).getIdCore() + "," 
-			+ fila_saida.get(i).getTempo_turnaround() +	"," + fila_saida.get(i).getTempo_espera() + "," 
-					+ fila_saida.get(i).getTempo_resposta());
+			bw.write(fila_saida.get(i).getId() + "," 
+			+ fila_saida.get(i).getIdCore() + "," 
+			+ fila_saida.get(i).getTempo_turnaround() +	"," 
+			+ fila_saida.get(i).getTempo_espera() + "," 
+			+ fila_saida.get(i).getTempo_resposta());
 			bw.newLine();
 		}
 		
@@ -41,15 +43,21 @@ public class EscritorArquivo{
 		this.fila_saida= fila_saida;	
 	}
 	
-	public double calculaTempoMedio(){
+	public String calculaTempoMedio(){
 		
-		double aux=0;
+		double aux=0, espera = 0;
 		
 		for(int i=0; i<fila_saida.size(); i++)			
 			aux+= fila_saida.get(i).getTempo_resposta();
 		
 		aux/= fila_saida.size(); //faz a media do tempo de resposta de todos os processos
 		
-		return aux;
+		for(int i=0; i<fila_saida.size(); i++)			
+			espera+= fila_saida.get(i).getTempo_espera();
+		
+		espera/= fila_saida.size();
+		
+		return "Tempo Médio de Resposta: " + aux
+				+"\nTempo Médio de Espera: " + espera;
 	}
 }
