@@ -1,0 +1,698 @@
+\documentclass[12pt]{article}
+
+\usepackage{sbc}
+\usepackage{pgfplots}
+\usepackage{graphicx,url}
+
+\usepackage[brazil]{babel}   
+\usepackage[latin1]{inputenc}  
+
+     
+\sloppy
+
+\title{Uma Proposta de Evolução do Escalonador Alfa-Ômega}
+
+\author{Jéssica Aparecida R. Seibert\inst{1}, \\ Larissa Ferrarez Ribeiro\inst{1}, \\ Victor Pedro Correia da Silva\inst{1} }
+
+
+\address {Instituto Multidisciplinar -- Departamento de Ciência da Computação \\ Universidade Federal Rural do Rio de Janeiro (UFRRJ)\\
+    \email{jessicaa.raposo@gmail.com, lala\_ferrarez@yahoo.com.br, victorp@r7.com}
+}
+
+\begin{document} 
+
+\maketitle
+
+
+\section{Introdução}
+
+O problema dos escalonamiento de processos cerca os todos os sistemas operacionais conhecidos. Isto porque o paradigma de execução de tarefas em um computador moderno é feito através de processos, estes por sua vez são muitos e vindos de diferentes aplicações. Em um ambiente computacional multi-tarefa é fundamental que o sistema operacional ofereça suporte ao escalonamento de múltiplos processos e seja competente na escolha de qual processo será executado e como será executado nos recursos disponíveis.
+
+O escalonador determina qual processo dentre os que estão na memória, será alocado para ser processado pela CPU, e segue uma política de escolha, pré-definida, de acordo com o tipo de trabalho para o qual o computador foi destinado. \cite{edmar:06}
+
+O objetivo deste trabalho é apresentar um algoritmo de escalonamento de processos para uma máquina multicore. Para o desenvolvimento deste, foi elaborado um simulador de execução de processos, multi-core, onde é possível escolher quantos núcleos o processador simulado possuirá em sua arquitetura.
+
+Para obter dados comparativos, a fim de mostrar a eficiência do algoritmo proposto, comparamos o algoritmo criado com um outro algoritmo de escalonamento presente na literatura, o FIFO (First In, First Out). Como segue a ideia principal do trabalho, o algoritmo de escalonamento Alfa-Ômega.
+
+O algoritmo de escalonamento  Alfa-Ômega tem como ideia principal atuar com uma fila de processos, e ao dar entrada na CPU os processos são selecionados alternadamente. Dando continuidade ao trabalho, realizamos a versão 2 do projeto. O conceito continua o mesmo, porém, nesta nova implementação, foram criadas múltiplas filas, uma por núcleo do processador, onde os processos são enfileirados cada um em sua fila, permitindo que cada núcleo seja responsável pela sua própria fila de processos. 
+
+\section{Revisão Bibliográfica} \label{sec:revisao}
+
+O objetivo do escalonamento de processos é  ser justo, onde todos os processos devem ser tratados igualmente, tendo possibilidades idênticas de uso do processador, devendo ser evitado o adiamento indefinido; maximizar a produtividade, isto é, procurar maximizar o número de tarefas processadas por unidade de tempo; minimizar o tempo de resposta para os usuarios; minimizar sobrecarga e balancear o uso dos recursos.
+
+O algoritmo FIFO possui desvantagens como ser muito sensível a ordem de chegada, se processos maiores chegarem primeiro aumentarão o tempo médio de espera e não garante um tempo de resposta rápido, para resolver, porem o algoritmo FIFO é considerado o algoritmo mais simples entre os processos de escalonamento.
+
+Devido a praticidade do FIFO, a ideia do algoritmo Alfa-Ômega, seria não diferenciar muito à forma do FIFO, porem buscar diminuir o tempo médio de espera caso processos maiores cheguem primeiro, sendo assim maleável a ordem de execução dos mesmos, para isto foi feita uma intercalação entre a execução dos processos que estão na fila de espera, sendo variado entre o primeiro processo na fila de chegada e o ultimo processo, desta forma todos os processos são atendidos e o tempo de atraso para atender cada processo diminui, pois o tempo de espera dos processos no final da fila são menores e muitas vezes possuem um tempo curto de duração, não interferindo de forma direta nos processos que estão no inicio da fila.
+
+A forma utilizada para entrada de dados do simulador é a leitura de um arquivo de texto no formato ?id,tempo de chegada,duração? e a forma de saída é, primeiramente a execução do Alfa-Ômega, com o numero do processo, depois a ordem, o core a qual foi executado, tempo de turnaround, tempo de espera e tempo de resposta, depois de executar todos os processos é executado novamente os processos, porem utilizando o algoritmo do FIFO.
+Foram utilizados 5 exemplos de fila de processos, para poder analisar o desempenho dos algoritmos.
+
+
+\section{Algoritmo Proposto}
+O algoritmo  escolhido para comparação foi o FIFO, o mesmo serviu de base para desenvolvimento do novo algoritmo Alfa-Ômega.
+
+Originalmente, a proposta do algoritmo Alfa-Ômega era muito parecida com o algoritmo FIFO, porém, com a diferença de não pegar apenas o primeiro elemento da fila, mas ficar alternando entre o primeiro e último elemento da fila de processos.
+
+O algoritmo de escalonamento  Alfa-Ômega-Multi-Fila é uma estrutura mais complexa do algoritmo Alfa-Ômega, que diferentemente deste atua formando múltiplas filas, que variam de acordo com a quantidade de cores existentes, ou seja, uma fila para cada core. 
+
+A escolha da fila, é feita da seguinte forma: escolhe-se a fila com menor número de processos em espera, enfileira o processo, e, no momento de selecionar o processo a ser processado na CPU, o escalonamento é feito de forma alternada, ora o primeiro da fila, ora o último, como segue a idéia original. Ele também executa os processos como um todo do inicio ao fim, não interrompendo, é um algoritmo de escalonamento não preemptivo.
+
+\section{Avaliação do Desempenho}
+
+Para a avaliação do desempenho dos escalonadores foram utilizados as seguintes medidas de desempeho:
+\subsection {Tempo de Espera (waiting time)}
+
+É o tempo que a tarefa passa esperando, na fila, para ter o processamento iniciado. Pode ser contabilizado por operação ou pela tarefa inteira. Costuma-se também avaliar o tempo médio de espera das tarefas na instância. Em nosso trabalho utilizamos a média de tempo de espera dos processos, como mostra a expressão a seguir, onde \textit{W} é o tempo de espera por processo \textit{ i}, e \textit{MW} é a média dos tempos de espera destes processos. \cite{ricardo:10}
+\begin{equation}
+MW = \frac{1}{N} \sum_{i=1}^n W_{i}
+\end{equation}
+
+\subsection{Tempo de Resposta }
+Tempo que o processo demora para produzir alguma resposta à uma determinada requisição. \cite{edmar:06}
+
+Em nossos testes, utilizamos a média dos tempos de resposta de todos os processos de cada instância.
+
+\section{Resultados}
+
+Os testes realizados foram feitos utilizando 5 Instâncias diferentes de teste, com uma quantidade diferente de processos em cada. Foram também executados testes para processadores com 2, 3 e 4 núcleos.
+
+Nesta seção mostraremos as tabelas com os resultados apenas do algoritmo proposto, e depois, gráficos comparando o desempenho deste com sua primeira versão e com o FIFO.
+
+\subsection{Notações}
+
+Para facilitar a leitura dos resultados, utilizamos as seguintes notações para representar os dados nos gráficos:
+\begin{center}
+\begin{itemize}
+	\item {\bf AOMF} $\rightarrow$ Alfa-Ômega-Multi-Fila
+	\item {\bf AO} $\rightarrow$ Alfa-ômega
+	\item {\bf FIFO} $\rightarrow$ First-In First-Out
+\end{itemize}
+\end{center}
+
+
+
+\subsection{Escalonador Alfa-Ômega-Multi-Fila em 2 Cores}
+\subsubsection{Instância 1}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	2	&	0	&	2	&	0	&	2\\ 
+    0	&	1	&	5	&	0	&	5\\ 
+    1	&	1	&	7	&	4	&	7\\ 
+    3	&	0	&	7	&	1	&	7\\ 
+    4	&	0	&	6	&	5	&	6\\ 
+    5	&	1	&	7	&	2	&	7\\ 
+    8	&	1	&	6	&	4	&	6\\ 
+    7	&	0	&	10	&	3	&	10\\ 
+    6	&	1	&	13	&	9	&	13\\ 
+    \hline
+    Tempo Médio de Resposta: 7.0\\ 
+    Tempo Médio de Espera: 3.11
+\end{tabular}
+
+\subsubsection{Instância 2}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	2	&	0	&	4	&	0	&	4\\ 
+    0	&	1	&	7	&	0	&	7\\ 
+    4	&	1	&	3	&	0	&	3\\ 
+    1	&	1	&	18	&	8	&	18\\ 
+    9	&	1	&	17	&	4	&	17\\ 
+    6	&	1	&	31	&	24	&	31\\ 
+    7	&	1	&	34	&	28	&	34\\ 
+    3	&	0	&	57	&	2	&	57\\ 
+    5	&	0	&	59	&	54	&	59\\ 
+    8	&	0	&	92	&	52	&	92\\ 
+    \hline
+    Tempo Médio de Resposta: 32.2\\ 
+    Tempo Médio de Espera: 17.2
+\end{tabular}
+
+\subsubsection{Instância 3}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+    0	&	1	&	10	&	0	&	10\\ 
+    6	&	1	&	3	&	0	&	3\\ 
+    2	&	0	&	12	&	0	&	12\\ 
+    8	&	0	&	6	&	1	&	6\\ 
+    1	&	1	&	27	&	12	&	27\\ 
+    11	&	1	&	17	&	11	&	17\\ 
+    3	&	0	&	33	&	16	&	33\\ 
+    12	&	0	&	25	&	16	&	25\\ 
+    4	&	1	&	45	&	29	&	45\\ 
+    9	&	1	&	39	&	35	&	39\\ 
+    7	&	1	&	49	&	43	&	49\\ 
+    5	&	0	&	57	&	37	&	57\\ 
+    10	&	0	&	55	&	49	&	55\\ 
+    \hline
+    Tempo Médio de Resposta: 29.07\\ 
+    Tempo Médio de Espera: 19.15
+\end{tabular}
+
+\subsubsection{Instância 4}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	2	&	0	&	8	&	0	&	8\\ 
+    3	&	0	&	4	&	3	&	4\\ 
+    0	&	1	&	18	&	0	&	18\\ 
+    4	&	1	&	4	&	2	&	4\\ 
+    5	&	0	&	3	&	0	&	3\\ 
+    7	&	0	&	4	&	0	&	4\\ 
+    8	&	0	&	9	&	3	&	9\\ 
+    1	&	1	&	32	&	15	&	32\\ 
+    6	&	1	&	22	&	15	&	22\\ 
+    \hline
+    Tempo Médio de Resposta: 11.55\\ 
+    Tempo Médio de Espera: 4.22
+\end{tabular}
+
+\subsubsection{Instância 5}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	0	&	1	&	2	&	0	&	2\\ 
+    1	&	1	&	3	&	1	&	3\\ 
+    2	&	0	&	4	&	0	&	4\\ 
+    3	&	1	&	5	&	1	&	5\\ 
+    4	&	0	&	5	&	2	&	5\\ 
+    7	&	0	&	3	&	2	&	3\\ 
+    6	&	1	&	9	&	2	&	9\\ 
+    5	&	1	&	16	&	10	&	16\\ 
+    \hline
+    Tempo Médio de Resposta: 5.875\\ 
+    Tempo Médio de Espera: 2.25
+\end{tabular}
+
+\subsection{Escalonador Alfa-Ômega-Multi-Core em 3 Cores}
+
+\subsubsection{Instância 1}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	2	&	1	&	2	&	0	&	2\\ 
+    0	&	2	&	5	&	0	&	5\\ 
+    1	&	2	&	7	&	4	&	7\\ 
+    6	&	0	&	4	&	0	&	4\\ 
+    3	&	1	&	7	&	1	&	7\\ 
+    4	&	1	&	6	&	5	&	6\\ 
+    5	&	2	&	7	&	2	&	7\\ 
+    8	&	2	&	6	&	4	&	6\\ 
+    7	&	0	&	9	&	2	&	9\\ 
+    \hline
+    Tempo Médio de Resposta: 5.88\\ 
+    Tempo Médio de Espera: 2.0
+\end{tabular}
+
+\subsubsection{Instância 2}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	2	&	1	&	4	&	0	&	4\\ 
+    0	&	2	&	7	&	0	&	7\\ 
+    4	&	0	&	3	&	0	&	3\\ 
+    1	&	2	&	15	&	5	&	15\\ 
+    7	&	0	&	6	&	0	&	6\\ 
+    5	&	2	&	14	&	9	&	14\\ 
+    9	&	2	&	19	&	6	&	19\\ 
+    8	&	0	&	43	&	3	&	43\\ 
+    3	&	1	&	57	&	2	&	57\\ 
+    6	&	1	&	60	&	53	&	60\\ 
+    \hline
+    Tempo Médio de Resposta: 22.8\\ 
+    Tempo Médio de Espera: 7.8
+\end{tabular}
+
+\subsubsection{Instância 3}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	0	&	2	&	10	&	0	&	10\\ 
+    6	&	2	&	3	&	0	&	3\\ 
+    2	&	1	&	12	&	0	&	12\\ 
+    8	&	1	&	6	&	1	&	6\\ 
+    4	&	0	&	16	&	0	&	16\\ 
+    11	&	0	&	10	&	4	&	10\\ 
+    1	&	2	&	27	&	12	&	27\\ 
+    9	&	2	&	17	&	13	&	17\\ 
+    3	&	1	&	33	&	16	&	33\\ 
+    7	&	2	&	27	&	21	&	27\\ 
+    12	&	1	&	25	&	16	&	25\\ 
+    5	&	0	&	39	&	19	&	39\\ 
+    10	&	1	&	35	&	29	&	35\\ 
+    \hline
+    Tempo Médio de Resposta: 20.0\\ 
+    Tempo Médio de Espera: 10.07
+\end{tabular}
+
+\subsubsection{Instância 4}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	2	&	1	&	8	&	0	&	8\\ 
+    3	&	1	&	4	&	3	&	4\\ 
+    4	&	0	&	2	&	0	&	2\\ 
+    0	&	2	&	18	&	0	&	18\\ 
+    6	&	1	&	7	&	0	&	7\\ 
+    8	&	0	&	6	&	0	&	6\\ 
+    7	&	1	&	9	&	5	&	9\\ 
+    1	&	2	&	30	&	13	&	30\\ 
+    \hline
+    Tempo Médio de Resposta: 10.5\\ 
+    Tempo Médio de Espera: 2.625
+\end{tabular}
+
+\subsubsection{Instância 5}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	0	&	2	&	2	&	0	&	2\\ 
+    1	&	2	&	3	&	1	&	3\\ 
+    2	&	1	&	4	&	0	&	4\\ 
+    3	&	2	&	5	&	1	&	5\\ 
+    4	&	1	&	5	&	2	&	5\\ 
+    7	&	1	&	3	&	2	&	3\\ 
+    6	&	0	&	7	&	0	&	7\\ 
+    \hline
+    Tempo Médio de Resposta: 4.14\\ 
+    Tempo Médio de Espera: 0.85
+\end{tabular}
+
+\subsection{Escalonador Alfa-Ômega-Multi-Core em 4 Cores}
+
+\subsubsection{Instância 1}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	2	&	2	&	2	&	0	&	2\\ 
+    0	&	3	&	5	&	0	&	5\\ 
+    1	&	3	&	7	&	4	&	7\\ 
+    6	&	1	&	4	&	0	&	4\\ 
+    3	&	2	&	7	&	1	&	7\\ 
+    4	&	2	&	6	&	5	&	6\\ 
+    5	&	3	&	7	&	2	&	7\\ 
+    8	&	3	&	6	&	4	&	6\\ 
+    7	&	1	&	9	&	2	&	9\\ 
+    \hline
+    Tempo Médio de Resposta: 5.88\\ 
+    Tempo Médio de Espera: 2.0
+\end{tabular}
+
+\subsubsection{Instância 2}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	2	&	2	&	4	&	0	&	4\\ 
+    0	&	3	&	7	&	0	&	7\\ 
+    4	&	1	&	3	&	0	&	3\\ 
+    1	&	3	&	15	&	5	&	15\\ 
+    7	&	1	&	6	&	0	&	6\\ 
+    5	&	3	&	14	&	9	&	14\\ 
+    9	&	0	&	13	&	0	&	13\\ 
+    8	&	1	&	43	&	3	&	43\\ 
+    3	&	2	&	57	&	2	&	57\\ 
+    \hline
+    Tempo Médio de Resposta: 18.0\\ 
+    Tempo Médio de Espera: 2.11
+\end{tabular}
+
+\subsubsection{Instância 3}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	0	&	3	&	10	&	0	&	10\\ 
+    6	&	0	&	3	&	0	&	3\\ 
+    2	&	2	&	12	&	0	&	12\\ 
+    8	&	0	&	5	&	0	&	5\\ 
+    4	&	1	&	16	&	0	&	16\\ 
+    10	&	0	&	8	&	2	&	8\\ 
+    1	&	3	&	24	&	9	&	24\\ 
+    3	&	2	&	28	&	11	&	28\\ 
+    7	&	3	&	20	&	14	&	20\\ 
+    12	&	0	&	13	&	4	&	13\\ 
+    9	&	2	&	20	&	16	&	20\\ 
+    11	&	3	&	20	&	14	&	20\\ 
+    5	&	1	&	33	&	13	&	33\\ 
+    \hline
+    Tempo Médio de Resposta: 16.30\\ 
+    Tempo Médio de Espera: 6.38
+\end{tabular}
+
+\subsubsection{Instância 4}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	2	&	2	&	8	&	0	&	8\\ 
+    3	&	2	&	4	&	3	&	4\\ 
+    4	&	1	&	2	&	0	&	2\\ 
+    0	&	3	&	18	&	0	&	18\\ 
+    6	&	2	&	7	&	0	&	7\\ 
+    8	&	1	&	6	&	0	&	6\\ 
+    7	&	2	&	9	&	5	&	9\\ 
+    1	&	3	&	30	&	13	&	30\\ 
+    \hline
+    Tempo Médio de Resposta: 10.5\\ 
+    Tempo Médio de Espera: 2.625
+\end{tabular}
+
+\subsubsection{Instância 5}
+\begin{tabular}{c c c c c}
+	ID do Processo	&	ID do Core	&	Turnaround	&	Espera	&	Resposta \\
+	\hline
+	0	&	3	&	2	&	0	&	2\\ 
+    1	&	3	&	3	&	1	&	3\\ 
+    2	&	2	&	4	&	0	&	4\\ 
+    3	&	3	&	5	&	1	&	5\\ 
+    4	&	2	&	5	&	2	&	5\\ 
+    7	&	2	&	3	&	2	&	3\\ 
+    6	&	1	&	7	&	0	&	7\\ 
+    \hline
+    Tempo Médio de Resposta: 4.14\\ 
+    Tempo Médio de Espera: 0.85
+\end{tabular}
+
+\subsection{Gráficos Comparativos Entre os Algoritmos}
+
+\subsubsection{2 Cores Instância 1}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 7) (Espera, 3.11)};
+        \addplot coordinates {(Turnaround, 5) (Espera, 2)};
+        \addplot coordinates {(Turnaround, 6.2) (Espera, 2.3)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{2 Cores Instância 2}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 32.2) (Espera, 17.2)};
+        \addplot coordinates {(Turnaround, 32.7) (Espera, 17.7)};
+        \addplot coordinates {(Turnaround, 26.6) (Espera, 11.6)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{2 Cores Instância 3}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 29.07) (Espera, 19.15)};
+        \addplot coordinates {(Turnaround, 31.15) (Espera, 21.23)};
+        \addplot coordinates {(Turnaround, 33.53) (Espera, 23.61)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{2 Cores Instância 4}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 11.5) (Espera, 4.2)};
+        \addplot coordinates {(Turnaround, 13.7) (Espera, 6.4)};
+        \addplot coordinates {(Turnaround, 12.4) (Espera, 5.1)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{2 Cores Instância 5}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 5.8) (Espera, 2.25)};
+        \addplot coordinates {(Turnaround, 4.62) (Espera, 1)};
+        \addplot coordinates {(Turnaround, 5.25) (Espera, 1.62)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{3 Cores Instância 1}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 5.8) (Espera, 2)};
+        \addplot coordinates {(Turnaround, 4.3) (Espera, 0.4)};
+        \addplot coordinates {(Turnaround, 4.3) (Espera, 0.4)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{3 Cores Instância 2}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 22.8) (Espera, 7.8)};
+        \addplot coordinates {(Turnaround, 17.1) (Espera, 2.1)};
+        \addplot coordinates {(Turnaround, 16.9) (Espera, 1.9)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{3 Cores Instância 3}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 20) (Espera, 10.07)};
+        \addplot coordinates {(Turnaround, 17.5) (Espera, 8.41)};
+        \addplot coordinates {(Turnaround, 21.3) (Espera, 11.3)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{3 Cores Instância 4}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 10.5) (Espera, 2.62)};
+        \addplot coordinates {(Turnaround, 8.1) (Espera, 0.6)};
+        \addplot coordinates {(Turnaround, 8.0) (Espera, 0.5)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{3 Cores Instância 5}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 4.12) (Espera, 0.85)};
+        \addplot coordinates {(Turnaround, 3.8) (Espera, 0.25)};
+        \addplot coordinates {(Turnaround, 3.8) (Espera, 0.25)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{4 Cores Instância 1}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 5.8) (Espera, 2)};
+        \addplot coordinates {(Turnaround, 3.5) (Espera, 0)};
+        \addplot coordinates {(Turnaround, 3.5) (Espera, 0)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{4 Cores Instância 2}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 18) (Espera, 2.1)};
+        \addplot coordinates {(Turnaround, 7.1) (Espera, 0.25)};
+        \addplot coordinates {(Turnaround, 7.1) (Espera, 0.25)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{4 Cores Instância 3}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 16.3) (Espera, 6.3)};
+        \addplot coordinates {(Turnaround, 15.2) (Espera, 5.3)};
+        \addplot coordinates {(Turnaround, 15.2) (Espera, 5.3)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{4 Cores Instância 4}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 10.5) (Espera, 2.62)};
+        \addplot coordinates {(Turnaround, 7.5) (Espera, 0)};
+        \addplot coordinates {(Turnaround, 7.0) (Espera, 0)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{4 Cores Instância 5}
+\begin{center}
+    \begin{tikzpicture}
+        \begin{axis}[
+            ybar,
+            enlargelimits=0.5,
+            legend style={at={(0.5,-0.15)}, anchor=north,legend columns=-1},
+            ylabel=Médias,
+            symbolic x coords={Turnaround, Espera},
+            xtick=data,
+            nodes near coords,
+            bar width = 20pt
+            ]
+        \addplot coordinates {(Turnaround, 4.1) (Espera, 0.8)};
+        \addplot coordinates {(Turnaround, 3.6) (Espera, 0)};
+        \addplot coordinates {(Turnaround, 3.62) (Espera, 0)};
+        \legend{AOMF,AO,FIFO}
+        \end{axis}
+    \end{tikzpicture}
+\end{center}
+
+
+
+
+\bibliographystyle{sbc}
+\bibliography{sbc-template}
+\end{document}
