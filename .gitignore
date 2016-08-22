@@ -1,4 +1,5 @@
 # Ignore every .class file
 *.class
 /resultados
+bin/
 
